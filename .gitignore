@@ -36,6 +36,15 @@ yarn-error.log*
 # vercel
 .vercel
 
+# generated local artifacts
+after-adjustment.png
+final-artist-silhouette.png
+final-balanced.png
+final-mask-art.png
+final-more-particulate.png
+final-shot.png
+screenshot.png
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
