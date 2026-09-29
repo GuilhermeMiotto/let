@@ -31,11 +31,11 @@ export function easeInOutCubic(t: number): number {
 }
 
 export function getTargetInfluence(formationProgress: number, importance = 0.5): number {
-  const revealStart = 0.14;
-  const revealEnd = 0.7;
+  const revealStart = 0.1;
+  const revealEnd = 0.68;
   const revealProgress = clamp((formationProgress - revealStart) / (revealEnd - revealStart), 0, 1);
-  const revealCurve = Math.pow(easeInOutCubic(revealProgress), 1.65);
-  return clamp(revealCurve * (0.42 + importance * 0.86), 0, 1);
+  const revealCurve = Math.pow(easeInOutCubic(revealProgress), 1.9);
+  return clamp(revealCurve * (0.18 + importance * 0.5), 0, 0.72);
 }
 
 export function initializeParticles(
@@ -108,6 +108,13 @@ export function updatePhysics(
     const [px, py, pz] = particle.position;
     const [tx, ty, tz] = particle.targetPosition;
 
+    const cinematicDriftX =
+      Math.sin(time * 1.1 + particle.seed) * (14 + priority * 32) * (0.2 + (1 - revealAmount) * 1.1);
+    const cinematicDriftY =
+      Math.cos(time * 1.0 + particle.phase) * (12 + priority * 28) * (0.2 + (1 - revealAmount) * 1.1);
+    const dynamicTargetX = tx + cinematicDriftX;
+    const dynamicTargetY = ty + cinematicDriftY;
+
     const noiseA = noise3D(
       (tx + particle.seed) * EXPERIENCE_CONFIG.NOISE_SCALE,
       (ty + particle.phase) * EXPERIENCE_CONFIG.NOISE_SCALE,
@@ -158,12 +165,12 @@ export function updatePhysics(
 
     const fieldTargetX = lerp(galaxyX, emergenceX, stageB);
     const fieldTargetY = lerp(galaxyY, emergenceY, stageB);
-    const revealBlend = clamp(revealAmount * (0.18 + priority * 0.45), 0, 1);
-    const finalTargetX = lerp(fieldTargetX, tx, revealBlend * 0.46);
-    const finalTargetY = lerp(fieldTargetY, ty, revealBlend * 0.46);
+    const revealBlend = clamp(revealAmount * (0.22 + priority * 0.56), 0, 0.82);
+    const finalTargetX = lerp(fieldTargetX, dynamicTargetX, revealBlend * 0.9);
+    const finalTargetY = lerp(fieldTargetY, dynamicTargetY, revealBlend * 0.9);
 
-    const attractionX = isComplete ? tx : finalTargetX;
-    const attractionY = isComplete ? ty : finalTargetY;
+    const attractionX = isComplete ? tx + Math.sin(time * 1.1 + particle.seed) * (2.4 + priority * 3.8) : finalTargetX;
+    const attractionY = isComplete ? ty + Math.cos(time * 1.0 + particle.phase) * (2.1 + priority * 3.2) : finalTargetY;
 
     let vx =
       particle.velocity[0] * EXPERIENCE_CONFIG.DAMPING +
@@ -188,12 +195,14 @@ export function updatePhysics(
     }
 
     if (isComplete) {
-      vx = dx * 0.12;
-      vy = dy * 0.12;
-      vz = dz * 0.1;
+      const breathX = Math.sin(time * 1.1 + particle.seed) * (2.6 + priority * 4.2);
+      const breathY = Math.cos(time * 1.0 + particle.phase) * (2.4 + priority * 3.8);
+      vx = (tx + breathX - px) * 0.18;
+      vy = (ty + breathY - py) * 0.18;
+      vz = dz * 0.16;
     }
 
-    const maxVelocity = isComplete ? 1.1 : 3.1;
+    const maxVelocity = isComplete ? 2.3 : 4.4;
     const speed = Math.hypot(vx, vy, vz);
     if (speed > maxVelocity) {
       const scale = maxVelocity / speed;

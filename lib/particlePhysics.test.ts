@@ -120,8 +120,8 @@ test('timeline eventually marks the experience as complete after the reveal wind
 test('target reveal starts in time for the image to form during the experience', () => {
   assert.ok(getTargetInfluence(0.18, 0.98) < 0.05, 'image should stay hidden before the reveal begins');
   assert.ok(getTargetInfluence(0.42, 0.98) > 0.25, 'image should start revealing before the final act');
-  assert.ok(getTargetInfluence(0.84, 0.98) > 0.7, 'final act should have strong target influence');
-  assert.ok(getTargetInfluence(0.88, 1) > 0.85, 'high-priority particles should lock onto the image during the reveal');
+  assert.ok(getTargetInfluence(0.84, 0.98) < 0.9, 'final act should still breathe and retain particle motion instead of full rigid alignment');
+  assert.ok(getTargetInfluence(0.88, 1) > 0.6, 'high-priority particles should still resolve toward the image near completion');
 });
 
 test('dark but high-contrast pixels still receive image importance', () => {
