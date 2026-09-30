@@ -116,9 +116,9 @@ export function ParticleSystem({
       nextState.particles.forEach((particle) => {
         const [x, y] = particle.position;
         const [r, g, b] = particle.color;
-        const intensity = 0.56 + currentFormationProgress * 0.52;
-        const alpha = currentIsComplete ? 0.7 : Math.min(0.9, intensity);
-        const radius = Math.max(0.5, particle.size * (0.32 + currentFormationProgress * 0.9));
+        const intensity = 0.42 + currentFormationProgress * 0.58;
+        const alpha = Math.min(0.95, intensity * (currentIsComplete ? 0.96 : 1));
+        const radius = Math.max(0.5, particle.size * (0.34 + currentFormationProgress * 0.82));
 
         ctx.fillStyle = `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${alpha})`;
         ctx.beginPath();

@@ -44,15 +44,15 @@ export class TimelineController {
 
   getState(): TimelineState {
     const time = this.getCurrentTime();
-    const totalDuration = 28;
+    const totalDuration = 40;
     const totalProgress = clamp(time / totalDuration, 0, 1);
 
     const phaseInfo = [
-      { start: 0, end: 6, phase: 'intro_1', text: null },
-      { start: 6, end: 12, phase: 'intro_2', text: null },
-      { start: 12, end: 18, phase: 'intro_3', text: null },
-      { start: 18, end: 24, phase: 'organization', text: null },
-      { start: 24, end: 28, phase: 'formation', text: null },
+      { start: 0, end: 8, phase: 'intro_1', text: null },
+      { start: 8, end: 16, phase: 'intro_2', text: null },
+      { start: 16, end: 24, phase: 'intro_3', text: null },
+      { start: 24, end: 32, phase: 'organization', text: null },
+      { start: 32, end: 40, phase: 'formation', text: null },
     ] as const;
 
     let currentPhase: TimelinePhase = 'complete';
@@ -62,7 +62,7 @@ export class TimelineController {
     let phaseProgress = 0;
 
     if (time >= totalDuration) {
-      formationProgress = 1;
+      formationProgress = 0.96;
       currentPhase = 'complete';
       currentText = null;
       showText = false;
@@ -78,16 +78,16 @@ export class TimelineController {
         }
       }
 
-      if (time < 6) {
-        formationProgress = clamp(time / 6, 0, 0.12);
-      } else if (time < 12) {
-        formationProgress = clamp(0.12 + ((time - 6) / 6) * 0.18, 0.12, 0.3);
-      } else if (time < 18) {
-        formationProgress = clamp(0.3 + ((time - 12) / 6) * 0.2, 0.3, 0.5);
+      if (time < 8) {
+        formationProgress = clamp(time / 8, 0, 0.18);
+      } else if (time < 16) {
+        formationProgress = clamp(0.18 + ((time - 8) / 8) * 0.2, 0.18, 0.38);
       } else if (time < 24) {
-        formationProgress = clamp(0.5 + ((time - 18) / 6) * 0.22, 0.5, 0.72);
+        formationProgress = clamp(0.38 + ((time - 16) / 8) * 0.22, 0.38, 0.6);
+      } else if (time < 32) {
+        formationProgress = clamp(0.6 + ((time - 24) / 8) * 0.2, 0.6, 0.82);
       } else {
-        formationProgress = clamp(0.72 + ((time - 24) / 4) * 0.28, 0.72, 1);
+        formationProgress = clamp(0.82 + ((time - 32) / 8) * 0.14, 0.82, 0.96);
       }
     }
 
@@ -112,6 +112,7 @@ export class TimelineController {
   }
 
   isComplete(): boolean {
-    return this.getState().currentPhase === 'complete';
+    const state = this.getState();
+    return state.currentPhase === 'complete' && state.formationProgress >= 0.94;
   }
 }

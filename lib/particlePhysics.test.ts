@@ -102,7 +102,7 @@ test('early formation keeps the image hidden instead of snapping into the face',
   assert.ok(Math.abs(next.particles[0].position[1] - 400) > 20, 'target should stay hidden during early formation');
 });
 
-test('timeline eventually marks the experience as complete after the reveal window', () => {
+test('timeline eventually marks the experience as complete after the reveal window without a hard 100% jump', () => {
   const originalNow = performance.now.bind(performance);
   let fakeNow = 0;
   performance.now = () => fakeNow;
@@ -110,8 +110,9 @@ test('timeline eventually marks the experience as complete after the reveal wind
   try {
     const timeline = new TimelineController();
     timeline.start();
-    fakeNow = 35000;
+    fakeNow = 41000;
     assert.equal(timeline.isComplete(), true);
+    assert.ok(timeline.getState().formationProgress < 1, 'final formation should remain soft and never snap to 100% in one frame');
   } finally {
     performance.now = originalNow;
   }
@@ -119,9 +120,9 @@ test('timeline eventually marks the experience as complete after the reveal wind
 
 test('target reveal starts in time for the image to form during the experience', () => {
   assert.ok(getTargetInfluence(0.18, 0.98) < 0.05, 'image should stay hidden before the reveal begins');
-  assert.ok(getTargetInfluence(0.42, 0.98) > 0.25, 'image should start revealing before the final act');
-  assert.ok(getTargetInfluence(0.84, 0.98) < 0.9, 'final act should still breathe and retain particle motion instead of full rigid alignment');
-  assert.ok(getTargetInfluence(0.88, 1) > 0.6, 'high-priority particles should still resolve toward the image near completion');
+  assert.ok(getTargetInfluence(0.42, 0.98) > 0.1 && getTargetInfluence(0.42, 0.98) < 0.3, 'reveal should start gradually and remain soft before the final completion');
+  assert.ok(getTargetInfluence(0.84, 0.98) > 0.45, 'final act should still resolve toward the image without hard snap');
+  assert.ok(getTargetInfluence(0.9, 1) > 0.45, 'high-priority particles should still resolve toward the image near completion');
 });
 
 test('dark but high-contrast pixels still receive image importance', () => {

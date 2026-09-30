@@ -49,12 +49,12 @@ export function ParticleExperience() {
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
         const targetWidth = capabilitiesRef.current.isMobile
-          ? viewportWidth * 0.92
-          : viewportWidth * 0.76;
+          ? viewportWidth * 0.98
+          : viewportWidth * 0.8;
 
         const finalParticleCount = Math.max(
-          9000,
-          Math.min(capabilitiesRef.current.particleCount, 18000)
+          12000,
+          Math.min(capabilitiesRef.current.particleCount, 22000)
         );
 
         const result = await imageToParticles(

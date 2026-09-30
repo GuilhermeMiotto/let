@@ -76,24 +76,21 @@ function calculateQualityLevel(
   cores: number
 ): 'low' | 'medium' | 'high' {
   if (isMobile && !isTablet) {
-    // Mobile devices
-    if (memory < 4 || cores < 4) {
+    if (memory < 3 || cores < 3) {
       return 'low';
-    } else if (memory < 6 || cores < 6) {
-      return 'medium';
-    } else {
-      return 'high';
     }
-  } else {
-    // Desktop/tablet devices
-    if (memory < 4 || cores < 4) {
-      return 'low';
-    } else if (memory < 8 || cores < 8) {
-      return 'medium';
-    } else {
-      return 'high';
-    }
+    return 'high';
   }
+
+  if (memory < 3 || cores < 3) {
+    return 'low';
+  }
+
+  if (memory < 6 || cores < 6) {
+    return 'medium';
+  }
+
+  return 'high';
 }
 
 /**
@@ -109,11 +106,11 @@ function calculateParticleCount(
     : EXPERIENCE_CONFIG.PARTICLE_COUNT_DESKTOP;
   
   const qualityMultiplier = {
-    low: 0.5,
-    medium: 0.75,
-    high: 1.0,
+    low: 0.7,
+    medium: 0.9,
+    high: 1.15,
   };
-  
+
   return Math.floor(baseCount * qualityMultiplier[qualityLevel]);
 }
 

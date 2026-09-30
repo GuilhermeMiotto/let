@@ -31,11 +31,11 @@ export function easeInOutCubic(t: number): number {
 }
 
 export function getTargetInfluence(formationProgress: number, importance = 0.5): number {
-  const revealStart = 0.1;
-  const revealEnd = 0.68;
+  const revealStart = 0.08;
+  const revealEnd = 0.82;
   const revealProgress = clamp((formationProgress - revealStart) / (revealEnd - revealStart), 0, 1);
-  const revealCurve = Math.pow(easeInOutCubic(revealProgress), 1.9);
-  return clamp(revealCurve * (0.18 + importance * 0.5), 0, 0.72);
+  const revealCurve = Math.pow(easeInOutCubic(revealProgress), 1.7);
+  return clamp(revealCurve * (0.16 + importance * 0.48), 0, 0.9);
 }
 
 export function initializeParticles(
@@ -165,12 +165,13 @@ export function updatePhysics(
 
     const fieldTargetX = lerp(galaxyX, emergenceX, stageB);
     const fieldTargetY = lerp(galaxyY, emergenceY, stageB);
-    const revealBlend = clamp(revealAmount * (0.22 + priority * 0.56), 0, 0.82);
-    const finalTargetX = lerp(fieldTargetX, dynamicTargetX, revealBlend * 0.9);
-    const finalTargetY = lerp(fieldTargetY, dynamicTargetY, revealBlend * 0.9);
+    const revealBlend = clamp(revealAmount * (0.25 + priority * 0.65), 0, 0.96);
+    const finalTargetX = lerp(fieldTargetX, dynamicTargetX, revealBlend * 1.04);
+    const finalTargetY = lerp(fieldTargetY, dynamicTargetY, revealBlend * 1.04);
 
-    const attractionX = isComplete ? tx + Math.sin(time * 1.1 + particle.seed) * (2.4 + priority * 3.8) : finalTargetX;
-    const attractionY = isComplete ? ty + Math.cos(time * 1.0 + particle.phase) * (2.1 + priority * 3.2) : finalTargetY;
+    const softComplete = isComplete && formationProgress >= 0.93;
+    const attractionX = softComplete ? finalTargetX + Math.sin(time * 1.1 + particle.seed) * (0.8 + priority * 1.5) : finalTargetX;
+    const attractionY = softComplete ? finalTargetY + Math.cos(time * 1.0 + particle.phase) * (0.7 + priority * 1.4) : finalTargetY;
 
     let vx =
       particle.velocity[0] * EXPERIENCE_CONFIG.DAMPING +
@@ -194,15 +195,15 @@ export function updatePhysics(
       vy += (py - ty) * repel;
     }
 
-    if (isComplete) {
-      const breathX = Math.sin(time * 1.1 + particle.seed) * (2.6 + priority * 4.2);
-      const breathY = Math.cos(time * 1.0 + particle.phase) * (2.4 + priority * 3.8);
-      vx = (tx + breathX - px) * 0.18;
-      vy = (ty + breathY - py) * 0.18;
-      vz = dz * 0.16;
+    if (softComplete) {
+      const breathX = Math.sin(time * 1.1 + particle.seed) * (0.9 + priority * 1.5);
+      const breathY = Math.cos(time * 1.0 + particle.phase) * (0.8 + priority * 1.3);
+      vx = (finalTargetX + breathX - px) * 0.08;
+      vy = (finalTargetY + breathY - py) * 0.08;
+      vz = dz * 0.06;
     }
 
-    const maxVelocity = isComplete ? 2.3 : 4.4;
+    const maxVelocity = softComplete ? 2.2 : 4.4;
     const speed = Math.hypot(vx, vy, vz);
     if (speed > maxVelocity) {
       const scale = maxVelocity / speed;
@@ -227,9 +228,9 @@ export function updatePhysics(
     }
 
     const easing = easeInOutCubic(clamp(revealBlend, 0, 1));
-    const finalX = isComplete ? tx : nextX + (attractionX - nextX) * (0.08 + easing * 0.82);
-    const finalY = isComplete ? ty : nextY + (attractionY - nextY) * (0.08 + easing * 0.82);
-    const finalZ = isComplete ? tz : nextZ + (tz - nextZ) * (0.08 + easing * 0.6);
+    const finalX = softComplete ? nextX + (attractionX - nextX) * (0.18 + easing * 0.58) : nextX + (attractionX - nextX) * (0.08 + easing * 0.82);
+    const finalY = softComplete ? nextY + (attractionY - nextY) * (0.18 + easing * 0.58) : nextY + (attractionY - nextY) * (0.08 + easing * 0.82);
+    const finalZ = softComplete ? nextZ + (tz - nextZ) * (0.12 + easing * 0.38) : nextZ + (tz - nextZ) * (0.08 + easing * 0.6);
 
     return {
       ...particle,

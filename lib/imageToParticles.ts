@@ -82,7 +82,7 @@ function processImage(
   }
 
   const sourceAspect = img.width / img.height;
-  const finalTargetWidth = clamp(Math.round(targetWidth), 600, 1800);
+  const finalTargetWidth = clamp(Math.round(targetWidth), 900, 1800);
   const finalTargetHeight = Math.round(finalTargetWidth / sourceAspect);
 
   canvas.width = finalTargetWidth;
